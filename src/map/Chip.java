@@ -99,4 +99,9 @@ abstract public class Chip{
     Chip other = (Chip)obj;
     return location == other.getLocation() && getClass() == other.getClass();
   }
+
+  @Override
+  protected Object clone() throws CloneNotSupportedException{
+    return super.clone();
+  }
 }

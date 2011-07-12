@@ -113,7 +113,6 @@ public class Map{
    */
   public Map moveLoad(Point load, Direction d){
     if(!canMove(load, d)) return this;
-    // あとでかく
     return this;
   }
   
@@ -161,7 +160,13 @@ public class Map{
    */
   @Override
   protected Object clone() throws CloneNotSupportedException{
-    return new Map(this.map, this.chara, this.loads);
+    HashMap<Point, Chip> newMap = new HashMap<Point, Chip>();
+    Iterator<Point> itr = map.keySet().iterator();
+    while(itr.hasNext()){
+      Point key = itr.next();
+      newMap.put((Point)key.clone(), (Chip)map.get(key).clone());
+    }
+    return new Map(newMap, (Point)this.chara.clone(), this.loads);
   }
 
   /* (non-Javadoc)
