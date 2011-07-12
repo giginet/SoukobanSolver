@@ -6,6 +6,7 @@
  * 
  */
 package map;
+import java.awt.*;
 
 /**
  * @author giginet
@@ -16,7 +17,7 @@ public class Wall extends Chip{
   /**
    * 
    */
-  public Wall(){
+  public Wall(Point location){
     // TODO Auto-generated constructor stub
   }
 
