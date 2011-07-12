@@ -15,9 +15,9 @@ import java.awt.Point;
  * @author giginet
  */
 abstract public class Chip{
-  private final boolean goal = false;
-  private final boolean through = false;
-  private Point location = null;
+  protected final boolean goal = false;
+  protected final boolean through = false;
+  protected Point location = null;
   
   /**
    * コンストラクタです。初期位置は0,0に設定されます

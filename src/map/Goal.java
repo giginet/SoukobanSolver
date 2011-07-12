@@ -1,18 +1,18 @@
 /**
- * Floor.java
+ * Goal.java
  * SoukobanSolver
  *
- * Created by giginet on 2011/07/08
+ * Created by giginet on 2011/07/12
  * 
  */
 package map;
 
 /**
- * 床を表すクラスです
+ * 荷物の最終的な配置位置を場所のクラスです
  * @author giginet
  */
-public class Floor extends Chip{
-  protected final boolean goal = false;
+public class Goal extends Chip{
+  protected final boolean goal = true;
   protected final boolean through = true;
   
   /* (non-Javadoc)
@@ -20,6 +20,6 @@ public class Floor extends Chip{
    */
   @Override
   public String toString(){
-    return ".";
+    return "G";
   }
 }

@@ -6,19 +6,20 @@
  * 
  */
 package map;
-import java.awt.*;
 
 /**
+ * 壁を表すクラスです。全ての人物、荷物は進入できません
  * @author giginet
- *
  */
 public class Wall extends Chip{
-
-  /**
-   * 
+  protected final boolean goal = false;
+  protected final boolean through = false;
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
    */
-  public Wall(Point location){
-    // TODO Auto-generated constructor stub
+  @Override
+  public String toString(){
+    return "#";
   }
-
 }
