@@ -25,6 +25,7 @@ abstract public class Chip{
   public Chip(){
     this.location = new Point(0, 0);
   }
+  
   /**
    * 配置位置を指定するコンストラクタです
    * @param location 配置位置
@@ -98,8 +99,4 @@ abstract public class Chip{
     Chip other = (Chip)obj;
     return location == other.getLocation() && getClass() == other.getClass();
   }
-  
-  
-  
-
 }
