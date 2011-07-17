@@ -4,6 +4,7 @@
 package tests;
 
 import java.awt.Point;
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
@@ -74,6 +75,34 @@ public class MapTest{
       "##*...#.#\n" +
       "####..###\n" +
       "#########";
+  static final String testMap7 = 
+      "#########\n" +
+      "#.......#\n" +
+      "#.##*.#.#\n" +
+      "#....@*G#\n" +
+      "##..GG#.#\n" +
+      "##*...#.#\n" +
+      "####..###\n" +
+      "#########";
+  static final String testMap8 = 
+      "#########\n" +
+      "#.......#\n" +
+      "#.##*.#.#\n" +
+      "#.....@+#\n" +
+      "##..GG#.#\n" +
+      "##*...#.#\n" +
+      "####..###\n" +
+      "#########";
+  static final String testMap9 = 
+      "#########\n" +
+      "#.......#\n" +
+      "#.##.##.#\n" +
+      "#.@.....#\n" +
+      "##.+++#.#\n" +
+      "##....#.#\n" +
+      "####..###\n" +
+      "#########";
+  
   
   @Before
   public void setUp() throws Exception{
@@ -141,10 +170,10 @@ public class MapTest{
    */
   @Test
   public void canMoveLoadTest(){
-    assertTrue("上へ動かせる", map.canMove(new Point(4, 2), Direction.Up));
-    assertTrue("下へ動かせる", map.canMove(new Point(4, 2), Direction.Down));
-    assertFalse("右へ動かせない", map.canMove(new Point(4, 2), Direction.Right));
-    assertFalse("左へ動かせない", map.canMove(new Point(4, 2), Direction.Left)); 
+    assertTrue("上へ動かせる", map.canMove(new Point(4, 2), Direction.North));
+    assertTrue("下へ動かせる", map.canMove(new Point(4, 2), Direction.South));
+    assertFalse("右へ動かせない", map.canMove(new Point(4, 2), Direction.East));
+    assertFalse("左へ動かせない", map.canMove(new Point(4, 2), Direction.West)); 
   }
 
   /**
@@ -152,14 +181,28 @@ public class MapTest{
    */
   @Test
   public void moveCharaTest(){
-    Map moved = map.moveChara(Direction.Left);
+    Map moved = map.moveChara(Direction.West);
     assertEquals("何もないところへ移動できる", moved.toString(), MapTest.testMap4);
     Map map4 = Map.parse(MapTest.testMap4);
-    assertEquals("壁へは移動できない", map4.moveChara(Direction.Left).toString(), MapTest.testMap4);  
+    assertEquals("壁へは移動できない", map4.moveChara(Direction.West).toString(), MapTest.testMap4);  
     Map map3 = Map.parse(MapTest.testMap3);
-    assertEquals("荷物も一緒に移動できる", map3.moveChara(Direction.Down).toString(), MapTest.testMap6);  
+    assertEquals("荷物も一緒に移動できる", map3.moveChara(Direction.South).toString(), MapTest.testMap6);  
     Map map5 = Map.parse(MapTest.testMap5);
-    assertEquals("荷物を移動できない", map5.moveChara(Direction.Left).toString(), MapTest.testMap5);  
+    assertEquals("荷物を移動できない", map5.moveChara(Direction.West).toString(), MapTest.testMap5); 
+    Map map7 = Map.parse(MapTest.testMap7);
+    assertEquals("荷物を移動できる", map7.moveChara(Direction.East).toString(), MapTest.testMap8); 
+  }
+  
+  /**
+   * キャラクターを動かせるかどうかの判定をテストします
+   */
+  @Test
+  public void canMoveCharaTest(){
+    assertFalse("上に移動できない", map.canMoveChara(Direction.North));
+    assertTrue("右に移動できる", map.canMoveChara(Direction.East));
+    assertTrue("下に移動できる", map.canMoveChara(Direction.South));
+    assertTrue("左に移動できる", map.canMoveChara(Direction.West));
+    assertFalse("左上に移動できない", map.canMoveChara(Direction.NorthWest));
   }
   
   /**
@@ -167,7 +210,30 @@ public class MapTest{
    */
   @Test
   public void moveLoadTest(){
-    Map moved = map.moveLoad(new Point(4, 2), Direction.Up);
+    Map moved = map.moveLoad(new Point(4, 2), Direction.North);
     assertEquals("何もないところへ移動できる", moved.toString(), MapTest.testMap2);
   }
+  
+  /**
+   * 探索終了状態かテストします
+   */
+  @Test
+  public void isGoalTest(){
+    Map map9 = Map.parse(MapTest.testMap9);
+    assertFalse("ゴールではない", map.isGoal());
+    assertTrue("ゴールである", map9.isGoal());
+  }
+
+  /**
+   * 含まれているかのテスト
+   */
+  @Test
+  public void hashSetContainsTest(){
+    ArrayList<Map> set = new ArrayList<Map>();
+    Map map2 = Map.parse(MapTest.testMap);
+    set.add(map);
+    assertEquals("大きさが1", set.size(), 1);
+    assertTrue("含まれている", set.contains(map2));
+  }
+  
 }

@@ -168,17 +168,29 @@ public class Map{
   static public Point movePoint(Point point, Direction d){
     Point p = (Point)point.clone();
     switch(d){
-    case Up:
+    case North:
       p.translate(0, -1);
       break;
-    case Right:
+    case East:
       p.translate(1, 0);
       break;
-    case Down:
+    case South:
       p.translate(0, 1);
       break;
-    case Left:
+    case West:
       p.translate(-1, 0);
+      break;
+    case NorthEast:
+      p.translate(1, -1);
+      break;
+    case SouthEast:
+      p.translate(1, 1);
+      break;
+    case SouthWest:
+      p.translate(-1, 1);
+      break;
+    case NorthWest:
+      p.translate(-1, -1);
       break;
     }
     return p;
@@ -192,16 +204,27 @@ public class Map{
    */
   public boolean canMove(Point obj, Direction d){
     switch(d){
-    case Up:
+    case North:
       return canThrough(new Point(obj.x, obj.y-1));
-    case Right:
+    case East:
       return canThrough(new Point(obj.x+1, obj.y));
-    case Down:
+    case South:
       return canThrough(new Point(obj.x, obj.y+1));
-    case Left:
+    case West:
       return canThrough(new Point(obj.x-1, obj.y));
     }
     return false;
+  }
+  
+  /**
+   * キャラクターを指定した方向に動かせるかどうかを返します
+   * @param d 動かす方向
+   * @return 動かせるかどうか
+   */
+  public boolean canMoveChara(Direction d){
+    if(d == Direction.SouthEast || d == Direction.NorthEast || d == Direction.SouthWest || d == Direction.NorthWest) return false;
+    Point next = Map.movePoint(this.chara, d);
+    return canMove(this.chara, d) || (this.hasLoads(next) && canMove(next, d));
   }
   
   /**
@@ -232,7 +255,7 @@ public class Map{
   @Override
   public boolean equals(Object obj){
     Map other = (Map)obj;
-    Iterator<Point> itr = map.keySet().iterator();
+    /*Iterator<Point> itr = map.keySet().iterator();
     while(itr.hasNext()){
       Point key = itr.next();
       if(!(this.getChipAt(key).equals(other.getChipAt(key)))) return false;
@@ -241,7 +264,8 @@ public class Map{
     while(itr.hasNext()){
       if(!(other.loads.contains(itr.next()))) return false;
     }
-    return this.getLoadsCount() == other.getLoadsCount() && this.getWidth() == other.getWidth() && this.getHeight() == other.getHeight() && other.getChara().equals(this.chara);
+    return this.getLoadsCount() == other.getLoadsCount() && this.getWidth() == other.getWidth() && this.getHeight() == other.getHeight() && other.getChara().equals(this.chara);*/
+    return toString().equals(other.toString());
   }
   
   /**

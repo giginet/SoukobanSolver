@@ -13,8 +13,12 @@ package util;
  *
  */
 public enum Direction{
-  Up,
-  Right,
-  Down,
-  Left
+  North,
+  NorthEast,
+  East,
+  SouthEast,
+  South,
+  SouthWest,
+  West,
+  NorthWest
 }
