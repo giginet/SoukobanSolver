@@ -27,4 +27,9 @@ public class Goal extends Chip{
   public String toString(){
     return "G";
   }
+  
+  @Override
+  protected Object clone() throws CloneNotSupportedException{
+    return new Goal(location);
+  }
 }

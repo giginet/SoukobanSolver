@@ -25,4 +25,9 @@ public class Floor extends Chip{
   public String toString(){
     return ".";
   }
+  
+  @Override
+  protected Object clone() throws CloneNotSupportedException{
+    return new Floor(location);
+  }
 }

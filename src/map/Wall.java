@@ -26,4 +26,9 @@ public class Wall extends Chip{
   public String toString(){
     return "#";
   }
+  
+  @Override
+  protected Object clone() throws CloneNotSupportedException{
+    return new Wall(location);
+  }
 }

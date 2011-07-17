@@ -67,12 +67,16 @@ public class Map{
   }
   
   /**
-   * 指定された座標にあるマスを取り出します
+   * 指定された座標にあるマスを取り出します。見つからない場合はnullを返します
    * @param p 取り出したい座標
-   * @return その座標にあるマス
+   * @return その座標にあるマス。ない場合はnull
    */
   public Chip getChipAt(Point p){
-    return this.map.get(p);
+    if(this.map.containsKey(p)){
+      return this.map.get(p);
+    }else{
+      return null;
+    }
   }
   
   /**
@@ -113,13 +117,45 @@ public class Map{
    * ある荷物を指定した方向に動かしたときの状態を返します。動かせない場合は自分自身を返します
    * @param load 動かす荷物のある座標
    * @param d 荷物を動かす方向
-   * @return
+   * @return 荷物を動かした後の新しいマップ。動かせない場合は自分自身を返す
    */
   public Map moveLoad(Point load, Direction d){
     if(!canMove(load, d)) return this;
     return this;
   }
   
+  /**
+   * マップ内に存在する荷物の数を返します
+   * @return 荷物の数
+   */
+  public int getLoadsCount(){
+    return loads.size();
+  }
+  
+  /**
+   * 現在のキャラクターの位置を返します
+   * @return キャラクターの位置
+   */
+  public Point getChara(){
+    return chara;
+  }
+
+  /**
+   * マップの幅を返します
+   * @return マップ幅
+   */
+  public int getWidth(){
+    return width;
+  }
+
+  /**
+   * マップの高さを返します
+   * @return マップ高さ
+   */
+  public int getHeight(){
+    return height;
+  }
+
   /**
    * 2点間のマンハッタン距離を返します
    * @param p1 始点
@@ -159,7 +195,7 @@ public class Map{
     Point chara = null;
     HashSet<Point> loads = new HashSet<Point>();
     int goalCount = 0;
-    for(int i=1, x=0, y=0;i<chars.length;++i){
+    for(int i=0, x=0, y=0;i<chars.length;++i){
       String c = chars[i];
       if(c.equals("\n")){
         x = 0;
@@ -172,13 +208,15 @@ public class Map{
       }else if(c.equals("#")){
         map.put(p, new Wall(p));
       }else if(c.equals("*")){
-        map.put(p, new Floor(p));
         loads.add(p);
+        map.put(p, new Floor(p));
       }else if(c.equals("@") || c.equals("a")){
         if(chara==null){
           map.put(p, new Floor(p));
           chara = p;
-          if(c.equals("a")) loads.add((Point)p.clone());
+          if(c.equals("a")){
+            map.put(p, new Goal(p));
+          }
         }else{
           throw new IllegalArgumentException("キャラクターは1カ所にしか設置できません");
         }
@@ -189,6 +227,8 @@ public class Map{
         map.put(p, new Goal(p));
         loads.add((Point)p.clone());
         ++goalCount;
+      }else if(c.equals("")){
+        continue;
       }else{
         throw new IllegalArgumentException("不正な文字\"" + c + "\"が含まれています");
       }
@@ -210,8 +250,8 @@ public class Map{
    * @param p 調べる座標
    * @return 進入可能かどうか
    */
-  private boolean canThrough(Point p){
-    return 0 <= p.x && p.x < width && 0 <= p.y && p.y < height && getChipAt(p).canThrough();
+  public boolean canThrough(Point p){
+    return 0 <= p.x && p.x < width && 0 <= p.y && p.y < height && getChipAt(p).canThrough() && !loads.contains(p);
   }
  
   /* (non-Javadoc)
@@ -249,6 +289,19 @@ public class Map{
     result = result.substring(0, result.length()-1); // 行末の\nを削除
     return result;
   }
+  
+  /**
+   * このマップの完全なるコピーを返します
+   * @return コピーされたマップ
+   */
+  public Map deepClone() throws CloneNotSupportedException{
+    try{
+      return (Map)this.clone();
+    }catch(CloneNotSupportedException e){
+      e.printStackTrace();
+      return null;
+    }
+  }
 
   /* (non-Javadoc)
    * @see java.lang.Object#clone()
@@ -256,12 +309,17 @@ public class Map{
   @Override
   protected Object clone() throws CloneNotSupportedException{
     HashMap<Point, Chip> newMap = new HashMap<Point, Chip>();
+    HashSet<Point> newLoads = new HashSet<Point>();
     Iterator<Point> itr = map.keySet().iterator();
     while(itr.hasNext()){
       Point key = itr.next();
       newMap.put((Point)key.clone(), (Chip)map.get(key).clone());
     }
-    return new Map(newMap, (Point)this.chara.clone(), this.loads);
+    itr = this.loads.iterator();
+    while(itr.hasNext()){
+      newLoads.add((Point)itr.next().clone());
+    }
+    return new Map(newMap, (Point)this.chara.clone(), newLoads);
   }
 
   /* (non-Javadoc)
@@ -270,6 +328,15 @@ public class Map{
   @Override
   public boolean equals(Object obj){
     Map other = (Map)obj;
-    return other.map == map && other.loads == loads && other.chara == chara;
+    Iterator<Point> itr = map.keySet().iterator();
+    while(itr.hasNext()){
+      Point key = itr.next();
+      if(!getChipAt(key).equals(getChipAt(key))) return false;
+    }
+    itr = this.loads.iterator();
+    while(itr.hasNext()){
+      if(!this.loads.contains(itr.next())) return false;
+    }
+    return this.getLoadsCount() == other.getLoadsCount() && this.getWidth() == other.getWidth() && this.getHeight() == other.getHeight() && other.getChara().equals(this.chara);
   }
 }
