@@ -7,10 +7,8 @@
  */
 package map;
 
-import java.lang.*;
 import java.util.*;
 import java.awt.*;
-
 import util.Direction;
 
 /**
@@ -19,11 +17,12 @@ import util.Direction;
  */
 public class Map{
   
-  private HashMap<Point, Chip> map = null;
   private Point chara = null;
-  private HashSet<Point> loads = null; 
-  private int width = 0;
+  
   private int height = 0;
+  private HashSet<Point> loads = null; 
+  private HashMap<Point, Chip> map = null;
+  private int width = 0;
   
   /**
    * コンストラクタ。大きさ0の空のマップを生成します
@@ -34,10 +33,9 @@ public class Map{
   
   /**
    * コンストラクタ。渡されたHashMapを元に、マップを初期化します
-   * @param map 座標をキー、 値をchipに持つHashMapを渡します
-   * @param start キャラクターの初期位置を表す座標を渡します
-   * @param loads 荷物の初期位置を表すHashSetを渡します
-   * @exception 渡されたマップのサイズが不正なとき、IllegalArgumentExceptionを投げます
+   * @param start キャラクターの初期位置を表す座標
+   * @param loads 荷物の初期位置を表すHashSet
+   * @exception 渡されたマップのサイズが不正なとき、IllegalArgumentException
    */
   public Map(HashMap<Point, Chip> map, Point start, HashSet<Point> loads) throws IllegalArgumentException{
     this.map = map;
@@ -58,6 +56,9 @@ public class Map{
     if(goalCount != loads.size()){
       throw new IllegalArgumentException("荷物とゴールの数が一致している必要があります");
     }
+    if(loads.contains(chara)){
+      throw new IllegalArgumentException("荷物とキャラクターは同じ座標には配置できません");
+    }
     width = max+1;
     // マップの高さを算出する
     if(map.size()%width != 0){
@@ -66,145 +67,6 @@ public class Map{
     height = map.size()/width;
   }
   
-  /**
-   * 指定された座標にあるマスを取り出します。見つからない場合はnullを返します
-   * @param p 取り出したい座標
-   * @return その座標にあるマス。ない場合はnull
-   */
-  public Chip getChipAt(Point p){
-    if(this.map.containsKey(p)){
-      return this.map.get(p);
-    }else{
-      return null;
-    }
-  }
-  
-  /**
-   * このマップが探索終了状態に到達しているかどうかを判定します（全ての荷物がゴール地点上に乗っているかをチェックします）
-   * @return このマップが探索終了状態かどうか
-   */
-  public boolean isGoal(){
-    Iterator<Point> itr = loads.iterator();
-    while(itr.hasNext()){
-      Point p = itr.next();
-      if(!getChipAt(p).isGoal()) return false;
-    }
-    return true;
-  }
-  
-  /**
-   * ある荷物、またはキャラクターを指定した方向に動かせるかどうかを返します
-   * @param obj 動かす物体のある座標
-   * @param d 物体を動かす方向
-   * @return この物体を動かせるかどうか
-   */
-  public boolean canMove(Point obj, Direction d){
-    switch(d){
-    case Up:
-      return canThrough(new Point(obj.x, obj.y-1));
-    case Right:
-      return canThrough(new Point(obj.x+1, obj.y));
-    case Down:
-      return canThrough(new Point(obj.x, obj.y+1));
-    case Left:
-      return canThrough(new Point(obj.x-1, obj.y));
-    }
-    return false;
-  }
-  
-  /**
-   * ある荷物を指定した方向に動かしたときの状態を返します。存在しない荷物を動かそうとしたり、動かせない場合は自分自身を返します
-   * @param load 動かす荷物のある座標
-   * @param d 荷物を動かす方向
-   * @return 荷物を動かした後の新しいマップ。動かせない場合は自分自身を返す
-   */
-  public Map moveLoad(Point load, Direction d){
-    if(!canMove(load, d) || !this.loads.contains(load)) return this;
-    try{
-      Map newMap = (Map)this.clone();
-      newMap.loads.remove(load);
-      newMap.loads.add(Map.movePoint(load, d));
-      return newMap;
-    }catch(CloneNotSupportedException e){
-      e.printStackTrace();
-      return this;
-    }
-  }
-  
-  /**
-   * キャラクターを指定した方向に動かしたときの状態を返します。動かせない場合は自分自身を返します
-   * @param d キャラクターを動かす方向
-   * @return キャラクターを動かした後の新しいマップ。動かせない場合は自分自身を返す
-   */
-  public Map moveChara(Direction d){
-    if(!canMove(this.chara, d)) return this;
-    try{
-      Map newMap = (Map)this.clone();
-      newMap.chara = Map.movePoint(newMap.chara, d);
-      return newMap;
-    }catch(CloneNotSupportedException e){
-      e.printStackTrace();
-      return this;
-    }
-  }
-  
-  /**
-   * 渡した点をDirectionの方向に動かした新しい点を生成します
-   * @param point 元の点
-   * @param d 動かしたいDirection
-   * @return 動いた後の新しい点
-   */
-  static private Point movePoint(Point point, Direction d){
-    Point p = (Point)point.clone();
-    switch(d){
-    case Up:
-      p.translate(0, -1);
-      break;
-    case Right:
-      p.translate(1, 0);
-      break;
-    case Down:
-      p.translate(0, 1);
-      break;
-    case Left:
-      p.translate(-1, 0);
-      break;
-    }
-    return p;
-  }
-  
-  /**
-   * マップ内に存在する荷物の数を返します
-   * @return 荷物の数
-   */
-  public int getLoadsCount(){
-    return loads.size();
-  }
-  
-  /**
-   * 現在のキャラクターの位置を返します
-   * @return キャラクターの位置
-   */
-  public Point getChara(){
-    return chara;
-  }
-
-  /**
-   * マップの幅を返します
-   * @return マップ幅
-   */
-  public int getWidth(){
-    return width;
-  }
-
-  /**
-   * マップの高さを返します
-   * @return マップ高さ
-   */
-  public int getHeight(){
-    return height;
-  }
-
   /**
    * 2点間のマンハッタン距離を返します
    * @param p1 始点
@@ -265,6 +127,7 @@ public class Map{
           chara = p;
           if(c.equals("a")){
             map.put(p, new Goal(p));
+            ++goalCount;
           }
         }else{
           throw new IllegalArgumentException("キャラクターは1カ所にしか設置できません");
@@ -295,6 +158,51 @@ public class Map{
   }
   
   /**
+   * 渡した点をDirectionの方向に動かした新しい点を生成します
+   * @param point 元の点
+   * @param d 動かしたいDirection
+   * @return 動いた後の新しい点
+   */
+  static private Point movePoint(Point point, Direction d){
+    Point p = (Point)point.clone();
+    switch(d){
+    case Up:
+      p.translate(0, -1);
+      break;
+    case Right:
+      p.translate(1, 0);
+      break;
+    case Down:
+      p.translate(0, 1);
+      break;
+    case Left:
+      p.translate(-1, 0);
+      break;
+    }
+    return p;
+  }
+  
+  /**
+   * ある荷物、またはキャラクターを指定した方向に動かせるかどうかを返します
+   * @param obj 動かす物体のある座標
+   * @param d 物体を動かす方向
+   * @return この物体を動かせるかどうか
+   */
+  public boolean canMove(Point obj, Direction d){
+    switch(d){
+    case Up:
+      return canThrough(new Point(obj.x, obj.y-1));
+    case Right:
+      return canThrough(new Point(obj.x+1, obj.y));
+    case Down:
+      return canThrough(new Point(obj.x, obj.y+1));
+    case Left:
+      return canThrough(new Point(obj.x-1, obj.y));
+    }
+    return false;
+  }
+  
+  /**
    * ある座標に荷物やキャラが進入可能かどうかを返します
    * @param p 調べる座標
    * @return 進入可能かどうか
@@ -302,7 +210,163 @@ public class Map{
   public boolean canThrough(Point p){
     return 0 <= p.x && p.x < width && 0 <= p.y && p.y < height && getChipAt(p).canThrough() && !loads.contains(p);
   }
+  
+  /**
+   * このマップの完全なるコピーを返します
+   * @return コピーされたマップ
+   */
+  public Map deepClone() throws CloneNotSupportedException{
+    try{
+      return (Map)this.clone();
+    }catch(CloneNotSupportedException e){
+      e.printStackTrace();
+      return null;
+    }
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj){
+    Map other = (Map)obj;
+    Iterator<Point> itr = map.keySet().iterator();
+    while(itr.hasNext()){
+      Point key = itr.next();
+      if(!(this.getChipAt(key).equals(other.getChipAt(key)))) return false;
+    }
+    itr = this.loads.iterator();
+    while(itr.hasNext()){
+      if(!(other.loads.contains(itr.next()))) return false;
+    }
+    return this.getLoadsCount() == other.getLoadsCount() && this.getWidth() == other.getWidth() && this.getHeight() == other.getHeight() && other.getChara().equals(this.chara);
+  }
+  
+  /**
+   * 現在のキャラクターの位置を返します
+   * @return キャラクターの位置
+   */
+  public Point getChara(){
+    return chara;
+  }
+
+  /**
+   * 指定された座標にあるマスを取り出します。見つからない場合はnullを返します
+   * @param p 取り出したい座標
+   * @return その座標にあるマス。ない場合はnull
+   */
+  public Chip getChipAt(Point p){
+    if(this.map.containsKey(p)){
+      return this.map.get(p);
+    }else{
+      return null;
+    }
+  }
+
+  /**
+   * マップの高さを返します
+   * @return マップ高さ
+   */
+  public int getHeight(){
+    return height;
+  }
+  
+  /**
+   * 現在の荷物の一覧を返します
+   * @return 荷物の場所を格納したHashMap
+   */
+  public HashSet<Point> getLoads(){
+    return loads;
+  }
+
+  /**
+   * マップ内に存在する荷物の数を返します
+   * @return 荷物の数
+   */
+  public int getLoadsCount(){
+    return loads.size();
+  }
+  
+  /**
+   * マップの幅を返します
+   * @return マップ幅
+   */
+  public int getWidth(){
+    return width;
+  }
+  
+  /**
+   * 渡された場所に荷物があるかどうかを返します
+   * @param p 調べる点
+   * @return 荷物があるかどうか
+   */
+  public boolean hasLoads(Point p){
+    return loads.contains(p);
+  }
+  
+  /**
+   * このマップが探索終了状態に到達しているかどうかを判定します（全ての荷物がゴール地点上に乗っているかをチェックします）
+   * @return このマップが探索終了状態かどうか
+   */
+  public boolean isGoal(){
+    Iterator<Point> itr = loads.iterator();
+    while(itr.hasNext()){
+      Point p = itr.next();
+      if(!getChipAt(p).isGoal()) return false;
+    }
+    return true;
+  }
  
+  /**
+   * キャラクターを指定した方向に移動したときの状態を返します。<br>
+   * 進行方向に荷物があり、その荷物も動かせる場合は同時に荷物も動かします。<br>
+   * 移動できない場合は自分自身を返します
+   * @param d キャラクターを動かす方向
+   * @return キャラクターを動かした後の新しいマップ。動かせない場合は自分自身
+   */
+  public Map moveChara(Direction d){
+    try{
+      Map newMap = (Map)this.clone();
+      Point next = Map.movePoint(newMap.chara, d);
+      if(this.hasLoads(next)){
+        // 移動先に荷物があった場合
+        // その荷物をさらにdに移動できなかった場合、自分自身を返す
+        if(!canMove(next, d)) return this;
+        // 移動できる場合、荷物とキャラを同時に動かす
+        newMap = newMap.moveLoad((Point)next.clone(), d);
+        newMap.chara = (Point)next.clone();
+        return newMap;
+      }else{
+        // 移動先に荷物がなかった場合
+        if(!canMove(chara, d)) return this;
+        newMap.chara = next;
+        return newMap;
+      }
+    }catch(CloneNotSupportedException e){
+      e.printStackTrace();
+      return this;
+    }
+  }
+  
+  /**
+   * ある荷物を指定した方向に動かしたときの状態を返します。存在しない荷物を動かそうとしたり、動かせない場合は自分自身を返します
+   * @param load 動かす荷物のある座標
+   * @param d 荷物を動かす方向
+   * @return 荷物を動かした後の新しいマップ。動かせない場合は自分自身
+   */
+  public Map moveLoad(Point load, Direction d){
+    if(!canMove(load, d) || !this.loads.contains(load)) return this;
+    try{
+      Map newMap = (Map)this.clone();
+      newMap.loads.remove(load);
+      newMap.loads.add(Map.movePoint(load, d));
+      return newMap;
+    }catch(CloneNotSupportedException e){
+      e.printStackTrace();
+      return this;
+    }
+  }
+
   /* (non-Javadoc)
    * @see java.lang.Object#toString()
    */
@@ -338,19 +402,6 @@ public class Map{
     result = result.substring(0, result.length()-1); // 行末の\nを削除
     return result;
   }
-  
-  /**
-   * このマップの完全なるコピーを返します
-   * @return コピーされたマップ
-   */
-  public Map deepClone() throws CloneNotSupportedException{
-    try{
-      return (Map)this.clone();
-    }catch(CloneNotSupportedException e){
-      e.printStackTrace();
-      return null;
-    }
-  }
 
   /* (non-Javadoc)
    * @see java.lang.Object#clone()
@@ -369,23 +420,5 @@ public class Map{
       newLoads.add((Point)itr.next().clone());
     }
     return new Map(newMap, (Point)this.chara.clone(), newLoads);
-  }
-
-  /* (non-Javadoc)
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object obj){
-    Map other = (Map)obj;
-    Iterator<Point> itr = map.keySet().iterator();
-    while(itr.hasNext()){
-      Point key = itr.next();
-      if(!(this.getChipAt(key).equals(other.getChipAt(key)))) return false;
-    }
-    itr = this.loads.iterator();
-    while(itr.hasNext()){
-      if(!(other.loads.contains(itr.next()))) return false;
-    }
-    return this.getLoadsCount() == other.getLoadsCount() && this.getWidth() == other.getWidth() && this.getHeight() == other.getHeight() && other.getChara().equals(this.chara);
   }
 }

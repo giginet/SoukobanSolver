@@ -56,6 +56,24 @@ public class MapTest{
       "##....#.#\n" +
       "####..###\n" +
       "#########";
+  static final String testMap5 = 
+      "#########\n" +
+      "#...*...#\n" +
+      "#.##.##.#\n" +
+      "#.....*.#\n" +
+      "##*aGG#.#\n" +
+      "##....#.#\n" +
+      "####..###\n" +
+      "#########";
+  static final String testMap6 = 
+      "#########\n" +
+      "#.......#\n" +
+      "#.##*.#.#\n" +
+      "#.....*.#\n" +
+      "##@GGG#.#\n" +
+      "##*...#.#\n" +
+      "####..###\n" +
+      "#########";
   
   @Before
   public void setUp() throws Exception{
@@ -135,7 +153,13 @@ public class MapTest{
   @Test
   public void moveCharaTest(){
     Map moved = map.moveChara(Direction.Left);
-    assertEquals(moved.toString(), MapTest.testMap4);
+    assertEquals("何もないところへ移動できる", moved.toString(), MapTest.testMap4);
+    Map map4 = Map.parse(MapTest.testMap4);
+    assertEquals("壁へは移動できない", map4.moveChara(Direction.Left).toString(), MapTest.testMap4);  
+    Map map3 = Map.parse(MapTest.testMap3);
+    assertEquals("荷物も一緒に移動できる", map3.moveChara(Direction.Down).toString(), MapTest.testMap6);  
+    Map map5 = Map.parse(MapTest.testMap5);
+    assertEquals("荷物を移動できない", map5.moveChara(Direction.Left).toString(), MapTest.testMap5);  
   }
   
   /**
@@ -144,6 +168,6 @@ public class MapTest{
   @Test
   public void moveLoadTest(){
     Map moved = map.moveLoad(new Point(4, 2), Direction.Up);
-    assertEquals(moved.toString(), MapTest.testMap2);
+    assertEquals("何もないところへ移動できる", moved.toString(), MapTest.testMap2);
   }
 }
