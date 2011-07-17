@@ -55,8 +55,8 @@ abstract public class Chip{
    * @param other 比較する他のマス目
    * @return ２つのマスが隣接しているかどうか
    */
-  public boolean connect(Chip other){
-    return Math.abs(getX()-other.getX()) + Math.abs(getY()-other.getY()) == 1;
+  public boolean isConnect(Chip other){
+    return !this.equals(other) && Math.abs(getX()-other.getX()) <= 1 && Math.abs(getY()-other.getY()) <= 1;
   }
   
   /**

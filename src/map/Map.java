@@ -17,12 +17,12 @@ import util.Direction;
  */
 public class Map{
   
-  private Point chara = null;
-  
+  private int width = 0;
   private int height = 0;
+  private Point chara = null;
   private HashSet<Point> loads = null; 
   private HashMap<Point, Chip> map = null;
-  private int width = 0;
+  private HashSet<Point> goals = null;
   
   /**
    * コンストラクタ。大きさ0の空のマップを生成します
@@ -41,7 +41,7 @@ public class Map{
     this.map = map;
     this.chara = start;
     this.loads = loads;
-    int goalCount = 0;
+    this.goals = new HashSet<Point>();
     int max = 0;
     if(map.size() == 0) throw new IllegalArgumentException("渡されたマップが空です");
     // マップの横幅を算出する
@@ -50,13 +50,15 @@ public class Map{
       Point p = itr.next();
       if(p.x > max) max = p.x;
       Chip chip = map.get(p);
-      if(chip.isGoal()) ++goalCount;
+      if(chip.isGoal()){
+        goals.add((Point)p.clone());
+      }
     }
     // ゴールの数と荷物の数を比べる
-    if(goalCount != loads.size()){
+    if(this.goals.size() != this.loads.size()){
       throw new IllegalArgumentException("荷物とゴールの数が一致している必要があります");
     }
-    if(loads.contains(chara)){
+    if(loads.contains(this.chara)){
       throw new IllegalArgumentException("荷物とキャラクターは同じ座標には配置できません");
     }
     width = max+1;
@@ -163,7 +165,7 @@ public class Map{
    * @param d 動かしたいDirection
    * @return 動いた後の新しい点
    */
-  static private Point movePoint(Point point, Direction d){
+  static public Point movePoint(Point point, Direction d){
     Point p = (Point)point.clone();
     switch(d){
     case Up:
@@ -261,6 +263,14 @@ public class Map{
     }else{
       return null;
     }
+  }
+
+  /**
+   * ゴールの位置の一覧を返します
+   * @return ゴールの位置を持ったHashMap
+   */
+  public HashSet<Point> getGoals(){
+    return goals;
   }
 
   /**
