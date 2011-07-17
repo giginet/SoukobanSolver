@@ -93,35 +93,84 @@ public class Map{
   }
   
   /**
-   * ある荷物を指定した方向に動かせるかどうかを返します
-   * @param load 動かす荷物のある座標
-   * @param d 荷物を動かす方向
-   * @return この荷物を動かせるかどうか
+   * ある荷物、またはキャラクターを指定した方向に動かせるかどうかを返します
+   * @param obj 動かす物体のある座標
+   * @param d 物体を動かす方向
+   * @return この物体を動かせるかどうか
    */
-  public boolean canMove(Point load, Direction d){
-    if(!loads.contains(load)) return false;
+  public boolean canMove(Point obj, Direction d){
     switch(d){
     case Up:
-      return canThrough(new Point(load.x, load.y-1));
+      return canThrough(new Point(obj.x, obj.y-1));
     case Right:
-      return canThrough(new Point(load.x+1, load.y));
+      return canThrough(new Point(obj.x+1, obj.y));
     case Down:
-      return canThrough(new Point(load.x, load.y+1));
+      return canThrough(new Point(obj.x, obj.y+1));
     case Left:
-      return canThrough(new Point(load.x-1, load.y));
+      return canThrough(new Point(obj.x-1, obj.y));
     }
     return false;
   }
   
   /**
-   * ある荷物を指定した方向に動かしたときの状態を返します。動かせない場合は自分自身を返します
+   * ある荷物を指定した方向に動かしたときの状態を返します。存在しない荷物を動かそうとしたり、動かせない場合は自分自身を返します
    * @param load 動かす荷物のある座標
    * @param d 荷物を動かす方向
    * @return 荷物を動かした後の新しいマップ。動かせない場合は自分自身を返す
    */
   public Map moveLoad(Point load, Direction d){
-    if(!canMove(load, d)) return this;
-    return this;
+    if(!canMove(load, d) || !this.loads.contains(load)) return this;
+    try{
+      Map newMap = (Map)this.clone();
+      newMap.loads.remove(load);
+      newMap.loads.add(Map.movePoint(load, d));
+      return newMap;
+    }catch(CloneNotSupportedException e){
+      e.printStackTrace();
+      return this;
+    }
+  }
+  
+  /**
+   * キャラクターを指定した方向に動かしたときの状態を返します。動かせない場合は自分自身を返します
+   * @param d キャラクターを動かす方向
+   * @return キャラクターを動かした後の新しいマップ。動かせない場合は自分自身を返す
+   */
+  public Map moveChara(Direction d){
+    if(!canMove(this.chara, d)) return this;
+    try{
+      Map newMap = (Map)this.clone();
+      newMap.chara = Map.movePoint(newMap.chara, d);
+      return newMap;
+    }catch(CloneNotSupportedException e){
+      e.printStackTrace();
+      return this;
+    }
+  }
+  
+  /**
+   * 渡した点をDirectionの方向に動かした新しい点を生成します
+   * @param point 元の点
+   * @param d 動かしたいDirection
+   * @return 動いた後の新しい点
+   */
+  static private Point movePoint(Point point, Direction d){
+    Point p = (Point)point.clone();
+    switch(d){
+    case Up:
+      p.translate(0, -1);
+      break;
+    case Right:
+      p.translate(1, 0);
+      break;
+    case Down:
+      p.translate(0, 1);
+      break;
+    case Left:
+      p.translate(-1, 0);
+      break;
+    }
+    return p;
   }
   
   /**
@@ -331,11 +380,11 @@ public class Map{
     Iterator<Point> itr = map.keySet().iterator();
     while(itr.hasNext()){
       Point key = itr.next();
-      if(!getChipAt(key).equals(getChipAt(key))) return false;
+      if(!(this.getChipAt(key).equals(other.getChipAt(key)))) return false;
     }
     itr = this.loads.iterator();
     while(itr.hasNext()){
-      if(!this.loads.contains(itr.next())) return false;
+      if(!(other.loads.contains(itr.next()))) return false;
     }
     return this.getLoadsCount() == other.getLoadsCount() && this.getWidth() == other.getWidth() && this.getHeight() == other.getHeight() && other.getChara().equals(this.chara);
   }

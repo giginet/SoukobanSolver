@@ -97,7 +97,7 @@ abstract public class Chip{
   @Override
   public boolean equals(Object obj){
     Chip other = (Chip)obj;
-    return location == other.getLocation() && getClass() == other.getClass();
+    return location.equals(other.getLocation()) && getClass().equals(other.getClass());
   }
 
   @Override

@@ -29,6 +29,33 @@ public class MapTest{
       "##....#.#\n" +
       "####..###\n" +
       "#########";
+  static final String testMap2 = 
+      "#########\n" +
+      "#...*...#\n" +
+      "#.##.##.#\n" +
+      "#.@...*.#\n" +
+      "##*GGG#.#\n" +
+      "##....#.#\n" +
+      "####..###\n" +
+      "#########";
+  static final String testMap3 = 
+      "#########\n" +
+      "#.......#\n" +
+      "#.##*.#.#\n" +
+      "#.@...*.#\n" +
+      "##*GGG#.#\n" +
+      "##....#.#\n" +
+      "####..###\n" +
+      "#########";
+  static final String testMap4 = 
+      "#########\n" +
+      "#.......#\n" +
+      "#.##*##.#\n" +
+      "#@....*.#\n" +
+      "##*GGG#.#\n" +
+      "##....#.#\n" +
+      "####..###\n" +
+      "#########";
   
   @Before
   public void setUp() throws Exception{
@@ -40,7 +67,6 @@ public class MapTest{
    */
   @Test
   public void toStringTest(){
-    System.out.print(map);
     assertEquals(map.toString(), testMap.toString());
   }
   
@@ -50,9 +76,19 @@ public class MapTest{
   @Test
   public void equalsTest(){
     Map map2 = Map.parse(MapTest.testMap);
-    assertEquals(map, map2);
-  }
-  
+    Map map3 = Map.parse(MapTest.testMap2);
+    Map map4 = Map.parse(MapTest.testMap3);
+    Map map5 = Map.parse(MapTest.testMap4);
+    assertEquals("生成された文字列が同じ", map.toString(), map2.toString());
+    assertEquals("マップ自身が同じ", map, map2);
+    assertFalse("生成された文字列が違う", map.toString().equals(map3.toString()));
+    assertFalse("マップ自身が違う", map.equals(map3));
+    assertFalse("生成された文字列が違う", map.toString().equals(map4.toString()));
+    assertFalse("マップ自身が違う", map.equals(map4));
+    assertFalse("生成された文字列が違う", map.toString().equals(map5.toString()));
+    assertFalse("マップ自身が違う", map.equals(map5));
+    assertNotSame("オブジェクト自体は違う", map, map2);
+}
   /**
    * マップのcloneができているかどうかをテストします
    */
@@ -67,23 +103,6 @@ public class MapTest{
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-  }
-  
-  /**
-   * 荷物を動かす動作が正常に動いているかをテストします
-   */
-  @Test
-  public void moveLoadTest(){
-    Map moved = map.moveLoad(new Point(4, 2), Direction.Up);
-    String movedStr = "#########\n" +
-                      "#...*...#\n" +
-                      "#.##.##.#\n" +
-                      "#.@...*.#\n" +
-                      "##*GGG#.#\n" +
-                      "##....#.#\n" +
-                      "####..###\n" +
-                      "#########";
-    assertEquals(moved.toString(), movedStr);
   }
   
   /**
@@ -107,8 +126,24 @@ public class MapTest{
     assertTrue("上へ動かせる", map.canMove(new Point(4, 2), Direction.Up));
     assertTrue("下へ動かせる", map.canMove(new Point(4, 2), Direction.Down));
     assertFalse("右へ動かせない", map.canMove(new Point(4, 2), Direction.Right));
-    assertFalse("左へ動かせない", map.canMove(new Point(4, 2), Direction.Left));
-    
-    assertFalse("存在しない荷物は動かせない", map.canMove(new Point(1, 1), Direction.Up));
+    assertFalse("左へ動かせない", map.canMove(new Point(4, 2), Direction.Left)); 
+  }
+
+  /**
+   * キャラクターを動かす動作が正常に動いているかをテストします
+   */
+  @Test
+  public void moveCharaTest(){
+    Map moved = map.moveChara(Direction.Left);
+    assertEquals(moved.toString(), MapTest.testMap4);
+  }
+  
+  /**
+   * 荷物を動かす動作が正常に動いているかをテストします
+   */
+  @Test
+  public void moveLoadTest(){
+    Map moved = map.moveLoad(new Point(4, 2), Direction.Up);
+    assertEquals(moved.toString(), MapTest.testMap2);
   }
 }
