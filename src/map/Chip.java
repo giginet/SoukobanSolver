@@ -15,8 +15,8 @@ import java.awt.Point;
  * @author giginet
  */
 abstract public class Chip{
-  protected final boolean goal = false;
-  protected final boolean through = false;
+  protected boolean goal = false;
+  protected boolean through = false;
   protected Point location = null;
   
   /**
@@ -39,7 +39,7 @@ abstract public class Chip{
    * @return このマス目がゴールであるかどうか
    */
   public boolean isGoal(){
-    return goal;
+    return this.goal;
   }
   
   /**
@@ -47,7 +47,7 @@ abstract public class Chip{
    * @return このマス目が通行可能かどうか
    */
   public boolean canThrough(){
-    return through;
+    return this.through;
   }
   
   /**

@@ -13,11 +13,9 @@ import java.awt.Point;
  * @author giginet
  */
 public class Floor extends Chip{
-  protected final boolean goal = false;
-  protected final boolean through = true;
-  
   public Floor(Point location){
     super(location);
+    through = true;
   }
   
   /* (non-Javadoc)

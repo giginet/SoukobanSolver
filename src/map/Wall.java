@@ -14,11 +14,9 @@ import java.awt.Point;
  * @author giginet
  */
 public class Wall extends Chip{
-  protected final boolean goal = false;
-  protected final boolean through = false;
-  
   public Wall(Point location){
     super(location);
+    through = false;
   }
   
   /* (non-Javadoc)

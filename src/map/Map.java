@@ -52,13 +52,17 @@ public class Map{
       Point p = itr.next();
       if(p.x > max) max = p.x;
       Chip chip = map.get(p);
-      if(chip.isGoal()) ++ goalCount;
+      if(chip.isGoal()) ++goalCount;
     }
     // ゴールの数と荷物の数を比べる
-    if(goalCount != loads.size()) throw new IllegalArgumentException("荷物の数とゴールの数が一致しません");
+    if(goalCount != loads.size()){
+      throw new IllegalArgumentException("荷物とゴールの数が一致している必要があります");
+    }
     width = max+1;
     // マップの高さを算出する
-    if(map.size()%width != 0) throw new IllegalArgumentException("渡されたマップのサイズが不正です");
+    if(map.size()%width != 0){
+      throw new IllegalArgumentException("渡されたマップのサイズが不正です");
+    }
     height = map.size()/width;
   }
   
@@ -155,7 +159,7 @@ public class Map{
     Point chara = null;
     HashSet<Point> loads = new HashSet<Point>();
     int goalCount = 0;
-    for(int i=0, x=0, y=0;i<chars.length;++i){
+    for(int i=1, x=0, y=0;i<chars.length;++i){
       String c = chars[i];
       if(c.equals("\n")){
         x = 0;
@@ -168,13 +172,15 @@ public class Map{
       }else if(c.equals("#")){
         map.put(p, new Wall(p));
       }else if(c.equals("*")){
+        map.put(p, new Floor(p));
         loads.add(p);
       }else if(c.equals("@") || c.equals("a")){
         if(chara==null){
+          map.put(p, new Floor(p));
           chara = p;
           if(c.equals("a")) loads.add((Point)p.clone());
         }else{
-          throw new IllegalArgumentException("キャラクターは1カ所にしか設置できません。");
+          throw new IllegalArgumentException("キャラクターは1カ所にしか設置できません");
         }
       }else if(c.equals("G")){
         map.put(p, new Goal(p));
@@ -184,17 +190,17 @@ public class Map{
         loads.add((Point)p.clone());
         ++goalCount;
       }else{
-        throw new IllegalArgumentException("不正な文字が含まれています。");
+        throw new IllegalArgumentException("不正な文字\"" + c + "\"が含まれています");
       }
       ++x;
     }
     if(chara == null){
-      throw new IllegalArgumentException("キャラクターを設置する必要があります。");
+      throw new IllegalArgumentException("キャラクターを設置する必要があります");
     }
     if(loads.isEmpty()){
-      throw new IllegalArgumentException("荷物を１つは設置する必要があります。");
+      throw new IllegalArgumentException("荷物を１つは設置する必要があります");
     }else if(loads.size() != goalCount){
-      throw new IllegalArgumentException("荷物とゴールの数が一致している必要があります。");
+      throw new IllegalArgumentException("荷物とゴールの数が一致している必要があります");
     }
     return new Map(map, chara, loads);
   }
@@ -218,28 +224,29 @@ public class Map{
       for(int x=0;x<width;++x){
         Point p = new Point(x, y);
         Chip c = this.map.get(p);
-        if(!c.canThrough()){
-          result += "#";
-        }else if(c.isGoal()){
+        if(c.getClass() == Wall.class){
+          result += c.toString();
+        }else if(c.getClass() == Goal.class){
           if(p.equals(chara)){
             result += "a";
           }else if(loads.contains(p)){
             result += "+";
           }else{
-            result += "G";
+            result += c.toString();
           }
-        }else{
+        }else if(c.getClass() == Floor.class){
           if(p.equals(chara)){
             result += "@";
           }else if(loads.contains(p)){
             result += "*";
           }else{
-            result += ".";
+            result += c.toString();
           }
         }
       }
       result += "\n";
     }
+    result = result.substring(0, result.length()-1); // 行末の\nを削除
     return result;
   }
 

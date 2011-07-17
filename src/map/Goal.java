@@ -14,11 +14,10 @@ import java.awt.Point;
  * @author giginet
  */
 public class Goal extends Chip{
-  protected final boolean goal = true;
-  protected final boolean through = true;
-  
   public Goal(Point location){
     super(location);
+    goal = true;
+    through = true;
   }
   
   /* (non-Javadoc)
