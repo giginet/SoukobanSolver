@@ -7,6 +7,8 @@
  */
 package map;
 
+import java.awt.Point;
+
 /**
  * 壁を表すクラスです。全ての人物、荷物は進入できません
  * @author giginet
@@ -14,6 +16,10 @@ package map;
 public class Wall extends Chip{
   protected final boolean goal = false;
   protected final boolean through = false;
+  
+  public Wall(Point location){
+    super(location);
+  }
   
   /* (non-Javadoc)
    * @see java.lang.Object#toString()

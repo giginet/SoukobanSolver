@@ -21,7 +21,7 @@ public class Map{
   
   private HashMap<Point, Chip> map = null;
   private Point chara = null;
-  private Set<Point> loads = null; 
+  private HashSet<Point> loads = null; 
   private int width = 0;
   private int height = 0;
   
@@ -36,10 +36,10 @@ public class Map{
    * コンストラクタ。渡されたHashMapを元に、マップを初期化します
    * @param map 座標をキー、 値をchipに持つHashMapを渡します
    * @param start キャラクターの初期位置を表す座標を渡します
-   * @param loads 荷物の初期位置を表すSetを渡します
-   * @exception 渡されたマップのサイズが不正なとき、IllegalArgumentExceptionを返します
+   * @param loads 荷物の初期位置を表すHashSetを渡します
+   * @exception 渡されたマップのサイズが不正なとき、IllegalArgumentExceptionを投げます
    */
-  public Map(HashMap<Point, Chip> map, Point start, Set<Point> loads) throws IllegalArgumentException{
+  public Map(HashMap<Point, Chip> map, Point start, HashSet<Point> loads) throws IllegalArgumentException{
     this.map = map;
     this.chara = start;
     this.loads = loads;
@@ -138,12 +138,65 @@ public class Map{
    * <td><tr>@</tr><tr>キャラクターが生成されます</tr></td>
    * <td><tr>a</tr><tr>最終到達点とキャラクターが重なっている状態を表します</tr></td>
    * <td><tr>G</tr><tr>荷物の最終到達点が生成されます</tr></td>
-   * <td><tr>g</tr><tr>最終到達点と荷物が重なっている状態を表します</tr></td>
+   * <td><tr>+</tr><tr>最終到達点と荷物が重なっている状態を表します</tr></td>
    * </table>
    * @return 新しく生成されたマップ
+   * @exception 以下の時、IllegalArgumentExceptionを投げます<br>
+   * <li>
+   * <ul>パースできない文字が含まれていたとき</ul>
+   * <ul>キャラクターが1カ所のみに設置されていないとき</ul>
+   * <ul>荷物が設置されていないとき</ul>
+   * <ul>ゴールの数と荷物の数が一致しなかったとき</ul>
+   * </li>
    */
-  static public Map parse(String str){
-    return new Map();
+  static public Map parse(String str) throws IllegalArgumentException{
+    String chars[] = str.split("");
+    HashMap<Point, Chip> map = new HashMap<Point, Chip>();
+    Point chara = null;
+    HashSet<Point> loads = new HashSet<Point>();
+    int goalCount = 0;
+    for(int i=0, x=0, y=0;i<chars.length;++i){
+      String c = chars[i];
+      if(c.equals("\n")){
+        x = 0;
+        ++y;
+        continue;
+      }
+      Point p = new Point(x, y);
+      if(c.equals(".")){
+        map.put(p, new Floor(p));
+      }else if(c.equals("#")){
+        map.put(p, new Wall(p));
+      }else if(c.equals("*")){
+        loads.add(p);
+      }else if(c.equals("@") || c.equals("a")){
+        if(chara==null){
+          chara = p;
+          if(c.equals("a")) loads.add((Point)p.clone());
+        }else{
+          throw new IllegalArgumentException("キャラクターは1カ所にしか設置できません。");
+        }
+      }else if(c.equals("G")){
+        map.put(p, new Goal(p));
+        ++goalCount;
+      }else if(c.equals("+")){
+        map.put(p, new Goal(p));
+        loads.add((Point)p.clone());
+        ++goalCount;
+      }else{
+        throw new IllegalArgumentException("不正な文字が含まれています。");
+      }
+      ++x;
+    }
+    if(chara == null){
+      throw new IllegalArgumentException("キャラクターを設置する必要があります。");
+    }
+    if(loads.isEmpty()){
+      throw new IllegalArgumentException("荷物を１つは設置する必要があります。");
+    }else if(loads.size() != goalCount){
+      throw new IllegalArgumentException("荷物とゴールの数が一致している必要があります。");
+    }
+    return new Map(map, chara, loads);
   }
   
   /**
@@ -153,6 +206,41 @@ public class Map{
    */
   private boolean canThrough(Point p){
     return 0 <= p.x && p.x < width && 0 <= p.y && p.y < height && getChipAt(p).canThrough();
+  }
+ 
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString(){
+    String result = "";
+    for(int y=0;y<height;++y){
+      for(int x=0;x<width;++x){
+        Point p = new Point(x, y);
+        Chip c = this.map.get(p);
+        if(!c.canThrough()){
+          result += "#";
+        }else if(c.isGoal()){
+          if(p.equals(chara)){
+            result += "a";
+          }else if(loads.contains(p)){
+            result += "+";
+          }else{
+            result += "G";
+          }
+        }else{
+          if(p.equals(chara)){
+            result += "@";
+          }else if(loads.contains(p)){
+            result += "*";
+          }else{
+            result += ".";
+          }
+        }
+      }
+      result += "\n";
+    }
+    return result;
   }
 
   /* (non-Javadoc)

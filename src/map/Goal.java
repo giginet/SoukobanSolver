@@ -7,6 +7,8 @@
  */
 package map;
 
+import java.awt.Point;
+
 /**
  * 荷物の最終的な配置位置を場所のクラスです
  * @author giginet
@@ -14,6 +16,10 @@ package map;
 public class Goal extends Chip{
   protected final boolean goal = true;
   protected final boolean through = true;
+  
+  public Goal(Point location){
+    super(location);
+  }
   
   /* (non-Javadoc)
    * @see java.lang.Object#toString()

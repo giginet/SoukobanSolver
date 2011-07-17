@@ -31,7 +31,7 @@ abstract public class Chip{
    * @param location 配置位置
    */
   public Chip(Point location){
-    this.location = location;
+    this.location = (Point)location.clone();
   }
   
   /**
