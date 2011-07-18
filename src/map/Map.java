@@ -84,23 +84,23 @@ public class Map{
    * @param str マップを表す文字列を渡します。各記号は以下の意味を持ちます<br>
    * 各行は\nで区切られている必要があります<br>
    * <table>
-   * <td><th>文字</th><th>生成されるもの</th></td>
-   * <td><tr>.</tr><tr>床が生成されます</tr></td>
-   * <td><tr>#</tr><tr>壁が生成されます</tr></td>
-   * <td><tr>*</tr><tr>荷物が生成されます</tr></td>
-   * <td><tr>@</tr><tr>キャラクターが生成されます</tr></td>
-   * <td><tr>a</tr><tr>最終到達点とキャラクターが重なっている状態を表します</tr></td>
-   * <td><tr>G</tr><tr>荷物の最終到達点が生成されます</tr></td>
-   * <td><tr>+</tr><tr>最終到達点と荷物が重なっている状態を表します</tr></td>
+   * <tr><th>文字</th><th>生成されるもの</th></tr>
+   * <tr><td>.</td><td>床が生成されます</td></tr>
+   * <tr><td>#</td><td>壁が生成されます</td></tr>
+   * <tr><td>*</td><td>荷物が生成されます</td></tr>
+   * <tr><td>@</td><td>キャラクターが生成されます</td></tr>
+   * <tr><td>a</td><td>最終到達点とキャラクターが重なっている状態を表します</td></tr>
+   * <tr><td>G</td><td>荷物の最終到達点が生成されます</td></tr>
+   * <tr><td>+</td><td>最終到達点と荷物が重なっている状態を表します</td></tr>
    * </table>
    * @return 新しく生成されたマップ
    * @exception 以下の時、IllegalArgumentExceptionを投げます<br>
-   * <li>
-   * <ul>パースできない文字が含まれていたとき</ul>
-   * <ul>キャラクターが1カ所のみに設置されていないとき</ul>
-   * <ul>荷物が設置されていないとき</ul>
-   * <ul>ゴールの数と荷物の数が一致しなかったとき</ul>
-   * </li>
+   * <ul>
+   * <li>パースできない文字が含まれていたとき</li>
+   * <li>キャラクターが1カ所のみに設置されていないとき</li>
+   * <li>荷物が設置されていないとき</li>
+   * <li>ゴールの数と荷物の数が一致しなかったとき</li>
+   * </ul>
    */
   static public Map parse(String str) throws IllegalArgumentException{
     String chars[] = str.split("");

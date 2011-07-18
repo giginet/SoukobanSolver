@@ -15,32 +15,17 @@ import util.Direction;
  *
  */
 public class Node{
+  private int cost;
   private Map current;
   private Node parent;
-  private int cost;
   
   /**
-   * 親ノードを持たない、現在の状態を持ったノードを生成します
+   * コンストラクタ。親ノードを持たない、現在の状態を持ったノードを生成します
    * @param m 現在のマップ
    */
   public Node(Map m){
     this.parent = null;
     this.current = m;
-    this.cost = calcCost();
-  }
-  
-  /**
-   * コンストラクタ。あるNodeを渡し、その状態からキャラクターを動かしたときのノードを生成します
-   * @param node 親ノード
-   * @param d 親ノードからどう変化させるか
-   */
-  public Node(Node node, Direction d){
-    this.parent = node;
-    try{
-      this.current = node.getCurrent().moveChara(d).deepClone();
-    }catch(CloneNotSupportedException e){
-      e.printStackTrace();
-    }
     this.cost = calcCost();
   }
   
@@ -60,13 +45,51 @@ public class Node{
   }
   
   /**
+   * コンストラクタ。あるNodeを渡し、その状態からキャラクターを動かしたときのノードを生成します
+   * @param node 親ノード
+   * @param d 親ノードからどう変化させるか
+   */
+  public Node(Node node, Direction d){
+    this.parent = node;
+    try{
+      this.current = node.getCurrent().moveChara(d).deepClone();
+    }catch(CloneNotSupportedException e){
+      e.printStackTrace();
+    }
+    this.cost = calcCost();
+  }
+  
+  /**
+   * 現在のコストを返します
+   * @return コスト
+   */
+  public int getCost(){
+    return cost;
+  }
+  
+  /**
+   * 現在のマップを返します
+   * @return 現在のマップ
+   */
+  public Map getCurrent(){
+    return current;
+  }
+  
+  /**
+   * 親ノードを返します。rootの場合はnullを返します
+   * @return 親ノード
+   */
+  public Node getParent(){
+    return parent;
+  }
+  
+  /**
    * コストを計算します
    * @return 計算されたコスト
    */
   private int calcCost(){
     int total = 0;
     if(current.isGoal()) return 0;
-    //HashMap<Point, Integer> loadCosts = new HashMap<Point, Integer>();
     Iterator<Point> loadItr = current.getLoads().iterator();
     // 一番コストの低い荷物を検索する
     int minCost = 1000000;
@@ -74,7 +97,6 @@ public class Node{
     while(loadItr.hasNext()){
       Point p = loadItr.next();
       int cost = calcCostForLoad(p);
-      //loadCosts.put(p, Integer.valueOf(cost*2));
       total += cost*4;
       if(cost != 0 && cost < minCost){
         minCost = cost;
@@ -91,7 +113,7 @@ public class Node{
     while(goalItr.hasNext()){
       Point point = goalItr.next();
       if(current.getLoads().contains(point)) continue; // ゴールと一致する荷物があったら無視
-      int cost = distance(load, point);
+      int cost = distance(load, point) * 100;
       if(cost < minCost){
         minCost = cost;
         minPoint = point;
@@ -106,12 +128,13 @@ public class Node{
     for(int i=0;i<ds.length-1;i+=2){
       Direction d = ds[i];
       Point next = Map.movePoint(load, d);
-      int cost = distance(next, goal);
+      int cost = distance(next, goal) * 100;
       if(maxDistance < cost){
         maxDistance = cost;
         maxPoint = next;
       }
     }    
+    goal = maxPoint;
     // キャラクターと荷物が隣接しているかどうか調べる
     if(!current.getChipAt(load).isConnect(current.getChipAt(current.getChara()))){
       // 隣接していない場合
@@ -119,25 +142,13 @@ public class Node{
       total += maxDistance + 300;
     }else{
       // 隣接している場合
-      // 一番遠い点から時計回りにコストを振り、現在の位置をコストに足す
-      int charaIndex = 0;
-      int goalIndex = 0;
       // 一番遠い点から時計回りにどれくらいのコストが加算されるかを調べる
-      int costTables[] = {0, 50, 100, 150, 200, 140, 90, 40};
-      for(int i=0;i<ds.length;++i){
-        Direction d = ds[i];
-        Point next = Map.movePoint(load, d);
-        if(next.equals(chara)){
-          charaIndex = i;
-        }else if(next.equals(maxPoint)){
-          goalIndex = i;
-        }
-      }
-      total += costTables[((goalIndex - charaIndex) + 8)%8];
+      // goalと今いる点のマンハッタン距離を調べて、距離に応じてスコア加算
+      total += distance(goal, chara) * 50;
     }
     return total;
   }
-  
+
   /**
    * ある荷物について、マップ中に存在する全てのゴールとのコストの総和を計算します。<br>
    * ある荷物とあるゴールのコストは、２点のマンハッタン距離に、その間にある障害物の数を乗じた物と一致します。<br>
@@ -156,7 +167,17 @@ public class Node{
     }
    return total;
   }
-  
+
+  /**
+   * 任意の2点間のマンハッタン距離を計測します
+   * @param p1
+   * @param p2
+   * @return 計測された距離
+   */
+  private int distance(Point p1, Point p2){
+    return Map.manhattanDistance(p1, p2);
+  }
+
   /**
    * 与えた２点を対角頂点とした区画の中にいくつの障害物があるかを計測します<br>
    * 障害物は、範囲内に存在する壁、または荷物です
@@ -174,37 +195,5 @@ public class Node{
     }
     return count;
   }
-  
-  private int distance(Point p1, Point p2){
-    int dx = Math.abs(p1.x - p2.x) * 100;
-    int dy = Math.abs(p1.y - p2.y) * 100;
-    int d = ((dx < dy) ? dx : dy) / 2;
-    return (dx + dy) - d;
-  }
 
-  /**
-   * 現在のマップを返します
-   * @return 現在のマップ
-   */
-  public Map getCurrent(){
-    return current;
-  }
-
-  /**
-   * 親ノードを返します
-   * @return 親ノード
-   */
-  public Node getParent(){
-    return parent;
-  }
-
-  /**
-   * 現在のコストを返します
-   * @return コスト
-   */
-  public int getCost(){
-    return cost;
-  }
-  
-  
 }
