@@ -56,12 +56,13 @@ public class SoukobanSolver{
     }
     System.out.println("finish");
     System.out.println((end-start)/1000.0 + " second");
+    System.out.println(result.size() + " steps");
   }
 
   public static void main(String[] args){
     String problem = "";
     try{
-      FileReader fr = new FileReader("src/problems/problem3");
+      FileReader fr = new FileReader("src/problems/problem2");
       BufferedReader br = new BufferedReader(fr);
       char tmp;
       while((tmp = (char)br.read()) != (char)-1){
