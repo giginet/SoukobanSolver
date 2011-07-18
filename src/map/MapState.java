@@ -19,6 +19,13 @@ public class MapState{
   private HashSet<Point> loads = null;
   private Map map = null;
   
+  /**
+   * コンストラクタ。マップデータ、キャラの位置、荷物の位置から現在のマップの状態を生成します
+   * @param map マップデータ
+   * @param chara キャラクターの位置
+   * @param loads 荷物の位置を含んだArrayList
+   * @throws IllegalArgumentException
+   */
   public MapState(Map map, Point chara, HashSet<Point> loads) throws IllegalArgumentException{
     this.map = map;
     this.chara = chara;
@@ -154,13 +161,58 @@ public class MapState{
   }
   
   /**
+   * マップ状態のコピーを返します
+   * @return コピーされたマップ状態
+   * @exception コピーできないとき、CloneNotSupportedExceptionを返します
+   */
+  public MapState deepClone(){
+    try{
+      return (MapState)clone();
+    }catch(CloneNotSupportedException e){
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+      return null;
+    }
+  }
+  
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj){
+    if(this == obj)
+      return true;
+    if(obj == null)
+      return false;
+    if(getClass() != obj.getClass())
+      return false;
+    MapState other = (MapState) obj;
+    if(chara == null){
+      if(other.chara != null)
+        return false;
+    }else if(!chara.equals(other.chara))
+      return false;
+    if(loads == null){
+      if(other.loads != null)
+        return false;
+    }else if(!loads.equals(other.loads))
+      return false;
+    if(map == null){
+      if(other.map != null)
+        return false;
+    }else if(!map.equals(other.map))
+      return false;
+    return true;
+  }
+
+  /**
    * 現在のキャラクターの位置を返します
    * @return キャラクターの位置
    */
   public Point getChara(){
     return chara;
   }
-  
+
   /**
    * 現在の荷物の一覧を返します
    * @return 荷物の場所を格納したHashMap
@@ -168,7 +220,7 @@ public class MapState{
   public HashSet<Point> getLoads(){
     return loads;
   }
-
+  
   /**
    * マップ内に存在する荷物の数を返します
    * @return 荷物の数
@@ -176,7 +228,15 @@ public class MapState{
   public int getLoadsCount(){
     return loads.size();
   }
-
+ 
+  /**
+   * マップを返します
+   * @return マップ
+   */
+  public Map getMap(){
+    return map;
+  }
+  
   /**
    * 渡された場所に荷物があるかどうかを返します
    * @param p 調べる点
@@ -185,7 +245,7 @@ public class MapState{
   public boolean hasLoads(Point p){
     return loads.contains(p);
   }
-  
+
   /**
    * このマップが探索終了状態に到達しているかどうかを判定します（全ての荷物がゴール地点上に乗っているかをチェックします）
    * @return このマップが探索終了状態かどうか
@@ -198,7 +258,7 @@ public class MapState{
     }
     return true;
   }
- 
+
   /**
    * キャラクターを指定した方向に移動したときの状態を返します。<br>
    * 進行方向に荷物があり、その荷物も動かせる場合は同時に荷物も動かします。<br>
@@ -229,7 +289,7 @@ public class MapState{
       return this;
     }
   }
-  
+
   /**
    * ある荷物を指定した方向に動かしたときの状態を返します。存在しない荷物を動かそうとしたり、動かせない場合は自分自身を返します
    * @param load 動かす荷物のある座標
@@ -248,8 +308,8 @@ public class MapState{
       return this;
     }
   }
-
-  /* (non-Javadoc)
+  
+  /**
    * @see java.lang.Object#toString()
    */
   @Override
@@ -285,7 +345,7 @@ public class MapState{
     return result;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see java.lang.Object#clone()
    */
   @Override
@@ -296,59 +356,6 @@ public class MapState{
       newLoads.add((Point)itr.next().clone());
     }
     return new MapState(this.map, (Point)this.chara.clone(), newLoads);
-  }
-
-  /**
-   * マップを返します
-   * @return マップ
-   */
-  public Map getMap(){
-    return map;
-  }
-  
-  /**
-   * マップ状態のコピーを返します
-   * @return コピーされたマップ状態
-   * @exception コピーできないとき、CloneNotSupportedExceptionを返します
-   */
-  public MapState deepClone(){
-    try{
-      return (MapState)clone();
-    }catch(CloneNotSupportedException e){
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      return null;
-    }
-  }
-
-  /* (non-Javadoc)
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object obj){
-    if(this == obj)
-      return true;
-    if(obj == null)
-      return false;
-    if(getClass() != obj.getClass())
-      return false;
-    MapState other = (MapState) obj;
-    if(chara == null){
-      if(other.chara != null)
-        return false;
-    }else if(!chara.equals(other.chara))
-      return false;
-    if(loads == null){
-      if(other.loads != null)
-        return false;
-    }else if(!loads.equals(other.loads))
-      return false;
-    if(map == null){
-      if(other.map != null)
-        return false;
-    }else if(!map.equals(other.map))
-      return false;
-    return true;
   }
   
   

@@ -90,22 +90,7 @@ public class Node{
     Direction ds[] = Direction.values();
     while(loadItr.hasNext()){
       Point p = loadItr.next();
-      // もし、いずれの方向にも移動不可で、ゴールに到達していない荷物が一つでもあったら
-      // その時点で非常に大きなスコアを返す（デッドロック）
       int cost = calcCostForLoad(p);
-      /*if(cost!=0){
-        int throughCount = 0;
-        for(int i=0;i<2;++i){
-          Direction d1 = ds[i*2];
-          Direction d2 = ds[i*2+4];
-          if(current.canThrough(Map.movePoint(p, d1)) && current.canThrough(Map.movePoint(p, d2))){
-            ++throughCount;
-          }
-        }
-        if(throughCount == 0){
-          return 1000000000;
-        }
-      }*/
       total += cost*4;
       if(cost != 0 && cost < minCost){
         minCost = cost;

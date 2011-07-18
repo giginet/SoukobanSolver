@@ -17,10 +17,10 @@ import util.Direction;
  */
 public class Map{
   
-  private int width = 0;
+  private HashSet<Point> goals = null;
   private int height = 0;
   private HashMap<Point, Chip> map = null;
-  private HashSet<Point> goals = null;
+  private int width = 0;
   
   /**
    * コンストラクタ。大きさ0の空のマップを生成します
@@ -105,19 +105,6 @@ public class Map{
   }
  
   /**
-   * このマップの完全なるコピーを返します
-   * @return コピーされたマップ
-   */
-  public Map deepClone() throws CloneNotSupportedException{
-    try{
-      return (Map)this.clone();
-    }catch(CloneNotSupportedException e){
-      e.printStackTrace();
-      return null;
-    }
-  }
-  
-  /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -167,6 +154,4 @@ public class Map{
   public int getWidth(){
     return width;
   }
-  
-  
 }
