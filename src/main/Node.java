@@ -6,6 +6,7 @@ package main;
 import java.lang.Math;
 import java.util.*;
 import java.awt.Point;
+import map.*;
 import map.Map;
 import util.Direction;
 
@@ -16,14 +17,14 @@ import util.Direction;
  */
 public class Node{
   private int cost;
-  private Map current;
+  private MapState current;
   private Node parent;
   
   /**
    * コンストラクタ。親ノードを持たない、現在の状態を持ったノードを生成します
-   * @param m 現在のマップ
+   * @param m 現在のマップ状態
    */
-  public Node(Map m){
+  public Node(MapState m){
     this.parent = null;
     this.current = m;
     this.cost = calcCost();
@@ -31,16 +32,12 @@ public class Node{
   
   /**
    * コンストラクタ。親ノードと現在のマップの状態からノードを生成します
-   * @param map 現在のマップ 
+   * @param map 現在のマップ状態
    * @param parent 親ノード
    */
-  public Node(Map map, Node parent){
+  public Node(MapState map, Node parent){
     this.parent = parent;
-    try{
-      this.current = map.deepClone();
-    }catch(CloneNotSupportedException e){
-      e.printStackTrace();
-    }
+    this.current = map.deepClone();
     this.cost = calcCost();
   }
   
@@ -51,11 +48,7 @@ public class Node{
    */
   public Node(Node node, Direction d){
     this.parent = node;
-    try{
-      this.current = node.getCurrent().moveChara(d).deepClone();
-    }catch(CloneNotSupportedException e){
-      e.printStackTrace();
-    }
+    this.current = node.getCurrent().moveChara(d).deepClone();
     this.cost = calcCost();
   }
   
@@ -71,7 +64,7 @@ public class Node{
    * 現在のマップを返します
    * @return 現在のマップ
    */
-  public Map getCurrent(){
+  public MapState getCurrent(){
     return current;
   }
   
@@ -109,7 +102,7 @@ public class Node{
     // その荷物から、一番近いゴールを探す
     minCost = 1000000;
     minPoint = null;
-    Iterator<Point> goalItr = current.getGoals().iterator();
+    Iterator<Point> goalItr = current.getMap().getGoals().iterator();
     while(goalItr.hasNext()){
       Point point = goalItr.next();
       if(current.getLoads().contains(point)) continue; // ゴールと一致する荷物があったら無視
@@ -136,7 +129,7 @@ public class Node{
     }    
     goal = maxPoint;
     // キャラクターと荷物が隣接しているかどうか調べる
-    if(!current.getChipAt(load).isConnect(current.getChipAt(current.getChara()))){
+    if(!current.getMap().getChipAt(load).isConnect(current.getMap().getChipAt(current.getChara()))){
       // 隣接していない場合
       // maxPointまでのコストを加算する
       total += maxDistance + 300;
@@ -158,8 +151,8 @@ public class Node{
    */
   private int calcCostForLoad(Point load){
     int total = 0;
-    if(current.getGoals().contains(load)) return 0; // 荷物がゴール上に存在した場合、0を返す
-    Iterator<Point> itr = current.getGoals().iterator();
+    if(current.getMap().getGoals().contains(load)) return 0; // 荷物がゴール上に存在した場合、0を返す
+    Iterator<Point> itr = current.getMap().getGoals().iterator();
     while(itr.hasNext()){
       Point goal = itr.next();
       int cost = distance(load, goal) * getObstacleCount(load, goal);

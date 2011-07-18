@@ -6,18 +6,18 @@ import java.util.PriorityQueue;
 import java.util.Iterator;
 
 import util.Direction;
-import map.Map;
+import map.MapState;
 
 public class SoukobanSolver{
 
   private PriorityQueue<Node> queue;
-  private ArrayList<Map> visited;
+  private ArrayList<MapState> visited;
 
   @SuppressWarnings("unchecked")
   public SoukobanSolver(String problem){
     queue = new PriorityQueue<Node>(1, new NodeComparator());
-    visited = new ArrayList<Map>();
-    Node initial = new Node(Map.parse(problem));
+    visited = new ArrayList<MapState>();
+    Node initial = new Node(MapState.parse(problem));
     queue.add(initial);
     Node current = null;
     // 探索する
@@ -27,11 +27,11 @@ public class SoukobanSolver{
       if(current.getCurrent().isGoal())
         break;
       Direction ds[] = Direction.values();
-      Map map = current.getCurrent();
+      MapState map = current.getCurrent();
       for(int i = 0; i < ds.length - 1; i += 2){
         Direction d = ds[i];
         if(!map.canMoveChara(d)) continue;
-        Map newMap = map.moveChara(d);
+        MapState newMap = map.moveChara(d);
         if(visited.contains(newMap)) continue;
         // 調査済みでなかったら、Queueに新しいノードを生成して格納
         visited.add(newMap);
@@ -42,13 +42,13 @@ public class SoukobanSolver{
     long end = System.currentTimeMillis();
     // 探索結果をたどる
     Node currentNode = current;
-    ArrayList<Map> result = new ArrayList<Map>();
+    ArrayList<MapState> result = new ArrayList<MapState>();
     while(currentNode != null){
       result.add(0, currentNode.getCurrent());
       currentNode = currentNode.getParent();
     }
     // 結果出力
-    Iterator<Map> itr = result.iterator();
+    Iterator<MapState> itr = result.iterator();
     while(itr.hasNext()){
       System.out.println(itr.next());
       if(itr.hasNext())
@@ -61,7 +61,7 @@ public class SoukobanSolver{
   public static void main(String[] args){
     String problem = "";
     try{
-      FileReader fr = new FileReader("src/problems/problem2");
+      FileReader fr = new FileReader("src/problems/problem3");
       BufferedReader br = new BufferedReader(fr);
       char tmp;
       while((tmp = (char)br.read()) != (char)-1){

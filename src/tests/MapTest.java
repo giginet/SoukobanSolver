@@ -20,7 +20,7 @@ import util.*;
  */
 public class MapTest{
 
-  Map map = null;
+  MapState map = null;
   static final String testMap = 
       "#########\n" +
       "#.......#\n" +
@@ -106,7 +106,7 @@ public class MapTest{
   
   @Before
   public void setUp() throws Exception{
-    map = Map.parse(MapTest.testMap);
+    map = MapState.parse(MapTest.testMap);
   }
 
   /**
@@ -122,10 +122,10 @@ public class MapTest{
    */
   @Test
   public void equalsTest(){
-    Map map2 = Map.parse(MapTest.testMap);
-    Map map3 = Map.parse(MapTest.testMap2);
-    Map map4 = Map.parse(MapTest.testMap3);
-    Map map5 = Map.parse(MapTest.testMap4);
+    MapState map2 = MapState.parse(MapTest.testMap);
+    MapState map3 = MapState.parse(MapTest.testMap2);
+    MapState map4 = MapState.parse(MapTest.testMap3);
+    MapState map5 = MapState.parse(MapTest.testMap4);
     assertEquals("生成された文字列が同じ", map.toString(), map2.toString());
     assertEquals("マップ自身が同じ", map, map2);
     assertFalse("生成された文字列が違う", map.toString().equals(map3.toString()));
@@ -141,15 +141,10 @@ public class MapTest{
    */
   @Test
   public void cloneTest(){
-    try{
-      Map map2 = map.deepClone();
-      assertEquals("生成された文字列が同じ", map.toString(), map2.toString());
-      assertEquals("マップ自身が同じ", map, map2);
-      assertNotSame("オブジェクト自体は違う", map, map2);
-    }catch(CloneNotSupportedException e){
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    MapState map2 = map.deepClone();
+    assertEquals("生成された文字列が同じ", map.toString(), map2.toString());
+    assertEquals("マップ自身が同じ", map, map2);
+    assertNotSame("オブジェクト自体は違う", map, map2);
   }
   
   /**
@@ -157,8 +152,8 @@ public class MapTest{
    */
   @Test
   public void canThroughTest(){
-    assertEquals("5, 2は壁である", map.getChipAt(new Point(5, 2)).getClass(), Wall.class);
-    assertFalse("5, 2は進行できない", map.getChipAt(new Point(5, 2)).canThrough());
+    assertEquals("5, 2は壁である", map.getMap().getChipAt(new Point(5, 2)).getClass(), Wall.class);
+    assertFalse("5, 2は進行できない", map.getMap().getChipAt(new Point(5, 2)).canThrough());
     assertFalse("荷物のあるところへは進行できない", map.canThrough(new Point(4, 2)));
     assertFalse("壁へは進行できない", map.canThrough(new Point(5, 2)));
     assertTrue("何もないところへは進行できる", map.canThrough(new Point(1, 1)));
@@ -181,15 +176,15 @@ public class MapTest{
    */
   @Test
   public void moveCharaTest(){
-    Map moved = map.moveChara(Direction.West);
+    MapState moved = map.moveChara(Direction.West);
     assertEquals("何もないところへ移動できる", moved.toString(), MapTest.testMap4);
-    Map map4 = Map.parse(MapTest.testMap4);
+    MapState map4 = MapState.parse(MapTest.testMap4);
     assertEquals("壁へは移動できない", map4.moveChara(Direction.West).toString(), MapTest.testMap4);  
-    Map map3 = Map.parse(MapTest.testMap3);
+    MapState map3 = MapState.parse(MapTest.testMap3);
     assertEquals("荷物も一緒に移動できる", map3.moveChara(Direction.South).toString(), MapTest.testMap6);  
-    Map map5 = Map.parse(MapTest.testMap5);
+    MapState map5 = MapState.parse(MapTest.testMap5);
     assertEquals("荷物を移動できない", map5.moveChara(Direction.West).toString(), MapTest.testMap5); 
-    Map map7 = Map.parse(MapTest.testMap7);
+    MapState map7 = MapState.parse(MapTest.testMap7);
     assertEquals("荷物を移動できる", map7.moveChara(Direction.East).toString(), MapTest.testMap8); 
   }
   
@@ -210,7 +205,7 @@ public class MapTest{
    */
   @Test
   public void moveLoadTest(){
-    Map moved = map.moveLoad(new Point(4, 2), Direction.North);
+    MapState moved = map.moveLoad(new Point(4, 2), Direction.North);
     assertEquals("何もないところへ移動できる", moved.toString(), MapTest.testMap2);
   }
   
@@ -219,7 +214,7 @@ public class MapTest{
    */
   @Test
   public void isGoalTest(){
-    Map map9 = Map.parse(MapTest.testMap9);
+    MapState map9 = MapState.parse(MapTest.testMap9);
     assertFalse("ゴールではない", map.isGoal());
     assertTrue("ゴールである", map9.isGoal());
   }
@@ -229,8 +224,8 @@ public class MapTest{
    */
   @Test
   public void hashSetContainsTest(){
-    ArrayList<Map> set = new ArrayList<Map>();
-    Map map2 = Map.parse(MapTest.testMap);
+    ArrayList<MapState> set = new ArrayList<MapState>();
+    MapState map2 = MapState.parse(MapTest.testMap);
     set.add(map);
     assertEquals("大きさが1", set.size(), 1);
     assertTrue("含まれている", set.contains(map2));
